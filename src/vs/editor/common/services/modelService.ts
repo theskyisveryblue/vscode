@@ -81,7 +81,8 @@ class DisposedModelInfo {
 
 export class ModelService extends Disposable implements IModelService {
 
-	public static MAX_MEMORY_FOR_CLOSED_FILES_UNDO_STACK = 20 * 1024 * 1024;
+	// Reduced from 20MB to 12MB for ~40% memory reduction (inspired by Void Editor optimizations)
+	public static MAX_MEMORY_FOR_CLOSED_FILES_UNDO_STACK = 12 * 1024 * 1024;
 
 	public _serviceBrand: undefined;
 

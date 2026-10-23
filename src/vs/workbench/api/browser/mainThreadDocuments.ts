@@ -30,9 +30,9 @@ export class BoundModelReferenceCollection {
 
 	constructor(
 		private readonly _extUri: IExtUri,
-		private readonly _maxAge: number = 1000 * 60 * 3, // auto-dispse by age
-		private readonly _maxLength: number = 1024 * 1024 * 80, // auto-dispose by total length
-		private readonly _maxSize: number = 50 // auto-dispose by number of references
+		private readonly _maxAge: number = 1000 * 60 * 2, // auto-dispse by age (reduced from 3min for faster cleanup)
+		private readonly _maxLength: number = 1024 * 1024 * 50, // auto-dispose by total length (reduced from 80MB to 50MB - ~37% reduction like Void)
+		private readonly _maxSize: number = 35 // auto-dispose by number of references (reduced from 50 to 35 - 30% reduction)
 	) {
 		//
 	}

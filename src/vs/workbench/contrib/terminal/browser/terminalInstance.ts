@@ -720,10 +720,19 @@ export class TerminalInstance extends Disposable implements ITerminalInstance {
 			return xtermConstructor;
 		}
 		xtermConstructor = Promises.withAsyncBody<typeof XTermTerminal>(async (resolve) => {
-			const Terminal = (await importAMDNodeModule<typeof import('@xterm/xterm')>('@xterm/xterm', 'lib/xterm.js')).Terminal;
-			// Localize strings
-			Terminal.strings.promptLabel = nls.localize('terminal.integrated.a11yPromptLabel', 'Terminal input');
-			Terminal.strings.tooMuchOutput = keybinding ? nls.localize('terminal.integrated.useAccessibleBuffer', 'Use the accessible buffer {0} to manually review output', keybinding.getLabel()) : nls.localize('terminal.integrated.useAccessibleBufferNoKb', 'Use the Terminal: Focus Accessible Buffer command to manually review output');
+			// Initialize ghostty-web first (API-compatible with xterm.js)
+			const ghosttyWeb = await importAMDNodeModule<typeof import('ghostty-web')>('ghostty-web', 'index.js');
+			await ghosttyWeb.init();
+			// Use ghostty-web Terminal but cast to xterm.js type for compatibility
+			// At runtime it's ghostty-web, but TypeScript sees xterm.js types
+			const xtermModule = await importAMDNodeModule<typeof import('@xterm/xterm')>('@xterm/xterm', 'lib/xterm.js');
+			// Cast through unknown to avoid type mismatch errors
+			const Terminal = ghosttyWeb.Terminal as unknown as typeof xtermModule.Terminal;
+			// Localize strings (ghostty-web is API-compatible with xterm.js)
+			if (Terminal.strings) {
+				Terminal.strings.promptLabel = nls.localize('terminal.integrated.a11yPromptLabel', 'Terminal input');
+				Terminal.strings.tooMuchOutput = keybinding ? nls.localize('terminal.integrated.useAccessibleBuffer', 'Use the accessible buffer {0} to manually review output', keybinding.getLabel()) : nls.localize('terminal.integrated.useAccessibleBufferNoKb', 'Use the Terminal: Focus Accessible Buffer command to manually review output');
+			}
 			resolve(Terminal);
 		});
 		return xtermConstructor;

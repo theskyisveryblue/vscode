@@ -1,0 +1,3 @@
+[submodule "extensions/copilot-chat.disabled"]
+	path = extensions/copilot-chat.disabled
+	url = git@github.com:microsoft/vscode-copilot-chat.git

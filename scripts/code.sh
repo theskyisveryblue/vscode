@@ -25,8 +25,17 @@ function code() {
 	fi
 
 	# Get electron, compile, built-in extensions
+	# Skip if already built to speed up subsequent launches
 	if [[ -z "${VSCODE_SKIP_PRELAUNCH}" ]]; then
-		node build/lib/preLaunch.js
+		# Only run prelaunch if electron doesn't exist or is older than 1 hour
+		if [ ! -f "$CODE" ] || [ "$(find .build/electron -name "*.app" -o -name "Code*" -mmin +60 2>/dev/null | head -1)" ]; then
+			node build/lib/preLaunch.js
+		fi
+	fi
+
+	# Start auto-monitoring if not already running
+	if [[ -z "${VSCODE_SKIP_AUTO_MONITOR}" ]] && [ -f "$ROOT/scripts/utils/start-auto-monitor.sh" ]; then
+		"$ROOT/scripts/utils/start-auto-monitor.sh" > /dev/null 2>&1 &
 	fi
 
 	# Manage built-in extensions
